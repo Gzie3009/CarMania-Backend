@@ -7,6 +7,8 @@ const cookieParser=require("cookie-parser")
 const bodyParser=require("body-parser")
 const cors=require("cors")
 const bcrypt=require("bcrypt")
+const dotenv=require("dotenv");
+dotenv.config({path: "./config.env"});
 
 const app= express()
 const allowedOrigins = ['http://localhost:3000']; // list of allowed client origins
@@ -27,7 +29,7 @@ app.use(cookieParser());
 
 
 
-mongoose.connect("mongodb+srv://Gzie3009:saikiaraj112233@cluster1.vitgru9.mongodb.net/users?retryWrites=true&w=majority").then(
+mongoose.connect(process.env.DB).then(
     function(){
         console.log("db connected")
     }

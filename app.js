@@ -42,7 +42,7 @@ const userSchema=mongoose.Schema({
         required:true,
         unique:true,
         validate:function(){
-            return(_validate(this.email))
+            return(emailValidator.validate(this.email))
         }
     },
     phone:{
@@ -59,16 +59,9 @@ const userSchema=mongoose.Schema({
         required:true,
         minlength:8,
         validate:function(){
-            return(this.password==this.confirmPassword)
+            return(emailValidator.validate(this.email))
         }
     }
-    // ,tokens:[
-    //     {token:{
-    //         type:String,
-    //         require:true
-    //     }
-    // }
-    // ]
 })
 
 userSchema.pre("save",async function(){
@@ -108,7 +101,7 @@ const checkoutSchema=mongoose.Schema({
         required:true,
         unique:true,
         validate:function(){
-            return(_validate(this.email))
+            return(emailValidator.validate(this.email))
         }
     },
     fname:{
@@ -209,7 +202,7 @@ async function login(req,res){
          compare(req.body.password, user.password, function(err, result) {
             if(result){
                 const uid=user._id;
-                const token= sign({payload:uid},JWT_KEY)
+                const token= jwt.sign({payload:uid},JWT_KEY)
                 res.status(200).json({
                     message:"user logged in successfully",
                     status:200,

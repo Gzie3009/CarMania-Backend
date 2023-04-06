@@ -11,31 +11,20 @@ const dotenv=require("dotenv");
 dotenv.config({path: "./config.env"});
 const app= express()
 
-const allowedOrigins = ['http://localhost:3000','https://642f205340eb6907f078f1a8--chipper-manatee-b6069f.netlify.app'];
+const allowedOrigins = ['http://localhost:3000', 'https://642f205340eb6907f078f1a8--chipper-manatee-b6069f.netlify.app'];
 
 const corsOptions = {
-    origin: function(origin, callback) {
-      if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    optionsSuccessStatus: 200,
-    credentials: true
-  };
-  
-  app.use(cors(corsOptions));
-  app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-  });
-  app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "https://642f205340eb6907f078f1a8--chipper-manatee-b6069f.netlify.app");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-  });
+  origin: function (origin, callback) {
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+};
+
+app.use(cors(corsOptions));
+
   
   app.use(express.json())
   app.use(bodyParser.urlencoded({ extended: true }));

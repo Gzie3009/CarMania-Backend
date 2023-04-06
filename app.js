@@ -209,7 +209,7 @@ async function login(req,res){
     if(req.body.email){
     let user= await userModel.findOne({email:req.body.email});
     if(user){
-         compare(req.body.password, user.password, function(err, result) {
+         bcrypt.compare(req.body.password, user.password, function(err, result) {
             if(result){
                 const uid=user._id;
                 const token= jwt.sign({payload:uid},JWT_KEY)

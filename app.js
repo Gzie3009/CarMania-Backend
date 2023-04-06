@@ -12,11 +12,11 @@ dotenv.config({path: "./config.env"});
 
 const app= express()
 
+app.use(cors())
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     next();
   });
-app.use(cors())
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -104,13 +104,21 @@ const paymentSchema=mongoose.Schema({
 })
 
 const checkoutSchema=mongoose.Schema({
+    email:{
+        type:String,
+        required:true,
+        unique:true,
+        validate:function(){
+            return(emailValidator.validate(this.email))
+        }
+    },
     fname:{
         type:String,
         required:true,
     },
     phone:{
         type:String,
-        required:true
+        required:true,
     },
     address:{
         type:String,
@@ -203,16 +211,6 @@ async function login(req,res){
             if(result){
                 const uid=user._id;
                 const token= jwt.sign({payload:uid},JWT_KEY)
-                res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
-                res.header('Access-Control-Allow-Credentials', true);
-                res.cookie("login", token, { 
-                    maxAge: 1000*60*60*24*30,
-                    httpOnly: true,
-                    sameSite: "none",
-                    secure: false
-                  });
-                  
-                  
                 res.status(200).json({
                     message:"user logged in successfully",
                     status:200,
@@ -340,4 +338,4 @@ async function checkout(req,res){
 
 
 
-app.listen(3010,()=>{console.log(`listening on port localhost:${3010}`)})
+app.listen(process.env.PORT||3010,()=>{console.log(`listening on port localhost:${3010}`)})

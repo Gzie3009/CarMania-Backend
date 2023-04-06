@@ -1,14 +1,16 @@
-const express=require("express")
-const mongoose = require("mongoose")
-const emailValidator =require("email-validator")
-const jwt= require("jsonwebtoken")
+import express, { json, Router } from "express"
+import { connect, Schema, model } from "mongoose"
+import { validate as _validate } from "email-validator"
+import pkg from 'jsonwebtoken';
+const { sign } = pkg;
 const JWT_KEY="abcdefghijklmnopqrstuvwxyz"
-const cookieParser=require("cookie-parser")
-const bodyParser=require("body-parser")
-const cors=require("cors")
-const bcrypt=require("bcrypt")
-const dotenv=require("dotenv");
-dotenv.config({path: "./config.env"});
+import cookieParser from "cookie-parser"
+import pkg1 from 'body-parser';
+const { urlencoded } = pkg1;
+import cors from "cors"
+import { genSalt, hashSync, compare } from "bcrypt"
+import { config } from "dotenv"
+config({path: "./config.env"});
 
 const app= express()
 
@@ -17,13 +19,13 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     next();
   });
-app.use(express.json())
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(json())
+app.use(urlencoded({ extended: true }));
 app.use(cookieParser());
 
 
 
-mongoose.connect(process.env.DB).then(
+connect(process.env.DB).then(
     function(){
         console.log("db connected")
     }
@@ -33,7 +35,7 @@ mongoose.connect(process.env.DB).then(
 
 
 
-const userSchema=mongoose.Schema({
+const userSchema=Schema({
     name:{
         type:String,
         required:true
@@ -43,7 +45,7 @@ const userSchema=mongoose.Schema({
         required:true,
         unique:true,
         validate:function(){
-            return(emailValidator.validate(this.email))
+            return(_validate(this.email))
         }
     },
     phone:{
@@ -74,12 +76,12 @@ const userSchema=mongoose.Schema({
 
 userSchema.pre("save",async function(){
     this.confirmPassword=undefined;
-        let salt=await bcrypt.genSalt()
-        const hash=bcrypt.hashSync(this.password, salt);
+        let salt=await genSalt()
+        const hash=hashSync(this.password, salt);
         this.password=hash;
 })
 
-const paymentSchema=mongoose.Schema({
+const paymentSchema=Schema({
     cardNo:{
         type:String,
         require:true
@@ -103,13 +105,13 @@ const paymentSchema=mongoose.Schema({
     }
 })
 
-const checkoutSchema=mongoose.Schema({
+const checkoutSchema=Schema({
     email:{
         type:String,
         required:true,
         unique:true,
         validate:function(){
-            return(emailValidator.validate(this.email))
+            return(_validate(this.email))
         }
     },
     fname:{
@@ -143,7 +145,7 @@ const checkoutSchema=mongoose.Schema({
     }
 })
 
-const contactSchema=mongoose.Schema({
+const contactSchema=Schema({
     name:{
         type:String,
         required:true
@@ -163,15 +165,15 @@ const contactSchema=mongoose.Schema({
 })
 
 
-const contactModel=mongoose.model("contactModel",contactSchema)
-const checkoutModel=mongoose.model("checkoutModel",checkoutSchema)
-const paymentModel=mongoose.model("paymentModel",paymentSchema)
-const userModel=mongoose.model("userModel",userSchema)
+const contactModel=model("contactModel",contactSchema)
+const checkoutModel=model("checkoutModel",checkoutSchema)
+const paymentModel=model("paymentModel",paymentSchema)
+const userModel=model("userModel",userSchema)
 
 
 
 
-const userRouter=express.Router();
+const userRouter=Router();
 app.use("/users",userRouter)
 
 userRouter
@@ -207,10 +209,10 @@ async function login(req,res){
     if(req.body.email){
     let user= await userModel.findOne({email:req.body.email});
     if(user){
-         bcrypt.compare(req.body.password, user.password, function(err, result) {
+         compare(req.body.password, user.password, function(err, result) {
             if(result){
                 const uid=user._id;
-                const token= jwt.sign({payload:uid},JWT_KEY)
+                const token= sign({payload:uid},JWT_KEY)
                 res.status(200).json({
                     message:"user logged in successfully",
                     status:200,
@@ -335,9 +337,5 @@ async function checkout(req,res){
     })
 }
 }
-
-app.listen("/",function(req,res){
-    res.send("Hello Backend")
-})
 
 app.listen(process.env.PORT||3010,()=>{console.log(`listening on port localhost:${3010}`)})

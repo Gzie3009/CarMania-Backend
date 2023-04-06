@@ -26,6 +26,17 @@ const corsOptions = {
   };
   
   app.use(cors(corsOptions));
+  app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "http://localhost:3000/");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
+  app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "https://642f205340eb6907f078f1a8--chipper-manatee-b6069f.netlify.app");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
+  
   app.use(express.json())
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(cookieParser());

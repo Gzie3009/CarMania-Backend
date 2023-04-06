@@ -1,17 +1,14 @@
-import express, { json, Router } from "express"
-import { connect, Schema, model } from "mongoose"
-import { validate as _validate } from "email-validator"
-import pkg from 'jsonwebtoken';
-const { sign } = pkg;
+const express=require("express")
+const mongoose = require("mongoose")
+const emailValidator =require("email-validator")
+const jwt= require("jsonwebtoken")
 const JWT_KEY="abcdefghijklmnopqrstuvwxyz"
-import cookieParser from "cookie-parser"
-import pkg1 from 'body-parser';
-const { urlencoded } = pkg1;
-import cors from "cors"
-import { genSalt, hashSync, compare } from "bcrypt"
-import { config } from "dotenv"
-config({path: "./config.env"});
-
+const cookieParser=require("cookie-parser")
+const bodyParser=require("body-parser")
+const cors=require("cors")
+const bcrypt=require("bcrypt")
+const dotenv=require("dotenv");
+dotenv.config({path: "./config.env"});
 const app= express()
 
 app.use(cors())
@@ -19,13 +16,13 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     next();
   });
-app.use(json())
-app.use(urlencoded({ extended: true }));
-app.use(cookieParser());
+  app.use(express.json())
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(cookieParser());
 
 
 
-connect(process.env.DB).then(
+mongoose.connect(process.env.DB).then(
     function(){
         console.log("db connected")
     }
@@ -35,7 +32,7 @@ connect(process.env.DB).then(
 
 
 
-const userSchema=Schema({
+const userSchema=mongoose.Schema({
     name:{
         type:String,
         required:true
@@ -77,11 +74,11 @@ const userSchema=Schema({
 userSchema.pre("save",async function(){
     this.confirmPassword=undefined;
         let salt=await genSalt()
-        const hash=hashSync(this.password, salt);
+        const hash=bcrypt.hashSync(this.password, salt);
         this.password=hash;
 })
 
-const paymentSchema=Schema({
+const paymentSchema=mongoose.Schema({
     cardNo:{
         type:String,
         require:true
@@ -105,7 +102,7 @@ const paymentSchema=Schema({
     }
 })
 
-const checkoutSchema=Schema({
+const checkoutSchema=mongoose.Schema({
     email:{
         type:String,
         required:true,
@@ -145,7 +142,7 @@ const checkoutSchema=Schema({
     }
 })
 
-const contactSchema=Schema({
+const contactSchema=mongoose.Schema({
     name:{
         type:String,
         required:true
@@ -165,15 +162,15 @@ const contactSchema=Schema({
 })
 
 
-const contactModel=model("contactModel",contactSchema)
-const checkoutModel=model("checkoutModel",checkoutSchema)
-const paymentModel=model("paymentModel",paymentSchema)
-const userModel=model("userModel",userSchema)
+const contactModel=mongoose.model("contactModel",contactSchema)
+const checkoutModel=mongoose.model("checkoutModel",checkoutSchema)
+const paymentModel=mongoose.model("paymentModel",paymentSchema)
+const userModel=mongoose.model("userModel",userSchema)
 
 
 
 
-const userRouter=Router();
+const userRouter=express.Router();
 app.use("/users",userRouter)
 
 userRouter

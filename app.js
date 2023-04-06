@@ -11,18 +11,12 @@ const dotenv=require("dotenv");
 dotenv.config({path: "./config.env"});
 
 const app= express()
-const allowedOrigins = ['http://localhost:3000']; // list of allowed client origins
 
-app.use(cors({
-  credentials: true,
-  origin: function(origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  }
-}));
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    next();
+  });
+app.use(cors())
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -104,19 +98,12 @@ const paymentSchema=mongoose.Schema({
     },
     cvv:{
         type:String,
-        require:true
+        require:true,
+        minlength:3
     }
 })
 
 const checkoutSchema=mongoose.Schema({
-    email:{
-        type:String,
-        required:true,
-        unique:true,
-        validate:function(){
-            return(emailValidator.validate(this.email))
-        }
-    },
     fname:{
         type:String,
         required:true,
@@ -156,10 +143,6 @@ const contactSchema=mongoose.Schema({
     email:{
         type:String,
         required:true,
-        unique:false,
-        validate:function(){
-            return(emailValidator.validate(this.email))
-        }
     },
     phone:{
         type:Number,
@@ -233,7 +216,8 @@ async function login(req,res){
                 res.status(200).json({
                     message:"user logged in successfully",
                     status:200,
-                    token:token
+                    token:token,
+                    email:user.email
                 })
 
             }

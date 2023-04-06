@@ -336,6 +336,8 @@ async function checkout(req,res){
 }
 }
 
-
+app.listen("/",function(req,res){
+    res.send("Hello Backend")
+})
 
 app.listen(process.env.PORT||3010,()=>{console.log(`listening on port localhost:${3010}`)})

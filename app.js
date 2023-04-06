@@ -11,7 +11,7 @@ const dotenv=require("dotenv");
 dotenv.config({path: "./config.env"});
 const app= express()
 
-const allowedOrigins = ['https://642f205340eb6907f078f1a8--chipper-manatee-b6069f.netlify.app'];
+const allowedOrigins = ['http://localhost:3000/','https://642f205340eb6907f078f1a8--chipper-manatee-b6069f.netlify.app'];
 
 app.use(cors({
   origin: function (origin, callback) {

@@ -11,7 +11,7 @@ const dotenv=require("dotenv");
 dotenv.config({path: "./config.env"});
 const app= express()
 
-const allowedOrigins = ['http://localhost:3000', 'https://642f205340eb6907f078f1a8--chipper-manatee-b6069f.netlify.app'];
+const allowedOrigins = ['http://localhost:3000', 'https://6430983306fb260e9e28df90--whimsical-pika-7beaac.netlify.app/'];
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -76,7 +76,7 @@ const userSchema=mongoose.Schema({
 
 userSchema.pre("save",async function(){
     this.confirmPassword=undefined;
-        let salt=await genSalt()
+        let salt=await bcrypt.genSalt()
         const hash=bcrypt.hashSync(this.password, salt);
         this.password=hash;
 })
@@ -183,13 +183,12 @@ userRouter
 
 async function signup(req,res){
     try{
-    const {name,email,phone,password,confirmPassword}=req.body;
-    const user =await userModel.create({name,email,phone,password,confirmPassword});
+    const user =await userModel.create(req.body);
+    console.log(user)
     if(user){
         res.status(200).json({
             message:"success",
-            status:200,
-            data:user
+            status:200
         })
     }
 }catch(e){

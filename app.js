@@ -62,12 +62,12 @@ const userSchema=mongoose.Schema({
     password:{
         type:String,
         required:true,
-        minlength:8
+        minlength:4
     },
     confirmPassword:{
         type:String,
         required:true,
-        minlength:8,
+        minlength:4,
         validate:function(){
             return(emailValidator.validate(this.email))
         }

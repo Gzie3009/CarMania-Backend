@@ -165,10 +165,10 @@ const contactSchema=mongoose.Schema({
 })
 
 
-const contactModel=mongoose.model("contactModel",contactSchema)
+const contactsModel=mongoose.model("contactsModel",contactSchema)
 const checkoutModel=mongoose.model("checkoutModel",checkoutSchema)
 const paymentModel=mongoose.model("paymentModel",paymentSchema)
-const userModel=mongoose.model("userModel",userSchema)
+const usersModel=mongoose.model("usersModel",userSchema)
 
 
 
@@ -183,7 +183,7 @@ userRouter
 
 async function signup(req,res){
     try{
-    const user =await userModel.create(req.body);
+    const user =await usersModel.create(req.body);
     console.log(user)
     if(user){
         res.status(200).json({
@@ -206,7 +206,7 @@ userRouter
 async function login(req,res){
     try{
     if(req.body.email){
-    let user= await userModel.findOne({email:req.body.email});
+    let user= await usersModel.findOne({email:req.body.email});
     if(user){
          bcrypt.compare(req.body.password, user.password, function(err, result) {
             if(result){
@@ -251,7 +251,7 @@ userRouter
 async function contactus(req,res){
     try{
         if((req.body.email || req.body.phone) && req.body.message){
-            const message=await contactModel.create(req.body)
+            const message=await contactsModel.create(req.body)
             if(message){
                 res.json({
                     message:"message sent successfully",
